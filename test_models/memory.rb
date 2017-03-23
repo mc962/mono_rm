@@ -1,5 +1,5 @@
 require_relative '../lib/model_base'
-require_relative './dragon'
+
 
 class Memory < ModelBase
   self.table_name = 'memories'

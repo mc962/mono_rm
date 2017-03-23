@@ -1,6 +1,6 @@
 require 'active_support/inflector'
 
-require_relative 'db_connection'
+require_relative './db_connection'
 require_relative './searchable'
 require_relative './associatable'
 
@@ -124,5 +124,16 @@ class SQLObject
     else
       insert
     end
+  end
+
+  def destroy
+    id = self.id
+    DBConnection.execute(<<-SQL, id)
+      DELETE
+      FROM
+        #{self.class.table_name}
+      WHERE
+        id = ?
+    SQL
   end
 end
