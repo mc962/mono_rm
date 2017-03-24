@@ -1,13 +1,9 @@
 require 'active_support/inflector'
 
-
-# will need delegation to decide which connection file to use
-# require_relative './db_connection'
-require_relative './pg_connection'
 require_relative './searchable'
 require_relative './associatable'
 
-require 'byebug'
+
 class SQLObject
 
   def self.columns
@@ -19,7 +15,6 @@ class SQLObject
       LIMIT
         1
     SQL
-      # @cols[0].map{|col| col[0].to_sym}
 
     @cols.map{|col| col.to_sym}
 

@@ -1,7 +1,9 @@
 require 'pry'
+require_relative '../config/boot'
 
-require_relative '../config/model_loader'
 ENV['DATABASE_URL'] ||= "postgres://localhost/dragons"
 
+load_db_adapter
 load_models
+
 binding.pry

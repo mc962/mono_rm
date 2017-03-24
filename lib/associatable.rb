@@ -2,7 +2,7 @@ require 'active_support/inflector'
 
 require_relative 'sql_object'
 require_relative 'searchable'
-
+require 'byebug'
 class AssocOptions
   attr_accessor(
     :foreign_key,
@@ -105,7 +105,7 @@ module Associatable
           #{through_options_table}.#{through_options_primary_key} = INTERPOLATOR_MARK
 
       SQL
-
+      
       source_options.model_class.parse_all(has_one_results).first
     end
   end
