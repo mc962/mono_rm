@@ -1,22 +1,9 @@
 require 'sqlite3'
 require 'yaml'
+
+require 'byebug'
 PRINT_QUERIES = ENV['PRINT_QUERIES'] == 'true'
-# https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
-# ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
-# DRAGONS_SQL_FILE = File.join(ROOT_FOLDER, 'dragons.sql')
-# DRAGONS_DB_FILE = File.join(ROOT_FOLDER, 'dragons.db')
 
-# CATS_SQL_FILE = File.join(ROOT_FOLDER, 'cats.sql')
-# CATS_DB_FILE = File.join(ROOT_FOLDER, 'cats.db')
-
-
-# begin
-#   SQL_DB = database_path
-#   # DBConnection.open(SQL_DB)
-# rescue ArgumentError => e
-#   puts "Could not open database file: #{e.message}"
-#   exit(1);
-# end
 
   database_file = begin
     dir = File.dirname(__FILE__)
@@ -47,33 +34,37 @@ class DBConnection
     @db
   end
 
-  def self.reset
-    # commands = [
-    #   "rm '#{DB_PATH}'",
-    #   "cat '#{SQL_PATH}' | sqlite3 '#{DB_PATH}'"
-    #   # "rm '#{DRAGONS_DB_FILE}'",
-    #   # "cat '#{DRAGONS_SQL_FILE}' | sqlite3 '#{DRAGONS_DB_FILE}'"
-    # ]
-    #
-    # commands.each { |command| `#{command}` }
-    DBConnection.open(DB_PATH)
-    # DBConnection.open(DRAGONS_DB_FILE)
-  end
-
   def self.instance
-    reset if @db.nil?
+    DBConnection.open(DB_NAME) if @db.nil?
 
     @db
   end
 
   def self.execute(*args)
     print_query(*args)
-    instance.execute(*args)
+    
+    sql_statement = args[0]
+    interpolated_sql_statement_elements = sql_statement.split(' ').map do |arg|
+      if arg == 'INTERPOLATOR_MARK'
+        interpolated_arg = "?"
+      else
+        arg
+      end
+    end
+    interpolated_sql_statement = interpolated_sql_statement_elements.join(' ')
+    args[0] = interpolated_sql_statement
+    # stringified_sql = args[0].join(' ')
+    interpolated_args = args.slice(1..-1)
+
+    
+    instance.execute(interpolated_sql_statement, interpolated_args)
   end
 
-  def self.execute2(*args)
+# execute2 returns array of rows if no block specified
+  def self.cols_exec(*args)
     print_query(*args)
-    instance.execute2(*args)
+
+    instance.execute2(*args)[0]
   end
 
   def self.last_insert_row_id

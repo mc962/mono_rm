@@ -102,7 +102,7 @@ module Associatable
           #{source_options_table}.#{source_options_primary_key} = #{through_options_table}.#{source_options_foreign_key}
 
         WHERE
-          #{through_options_table}.#{through_options_primary_key} = ?
+          #{through_options_table}.#{through_options_primary_key} = INTERPOLATOR_MARK
 
       SQL
 

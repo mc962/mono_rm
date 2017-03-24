@@ -1,20 +1,27 @@
 require 'active_support/inflector'
 
-require_relative './db_connection'
+
+# will need delegation to decide which connection file to use
+# require_relative './db_connection'
+require_relative './pg_connection'
 require_relative './searchable'
 require_relative './associatable'
 
-
+require 'byebug'
 class SQLObject
 
   def self.columns
-    @cols ||= DBConnection.execute2(<<-SQL)
+    @cols ||= DBConnection.cols_exec(<<-SQL)
       SELECT
         *
       FROM
         #{self.table_name}
+      LIMIT
+        1
     SQL
-    @cols[0].map{|col| col.to_sym}
+      # @cols[0].map{|col| col[0].to_sym}
+
+    @cols.map{|col| col.to_sym}
 
   end
 
@@ -58,7 +65,7 @@ class SQLObject
       FROM
         #{self.table_name}
       WHERE
-        id = ?
+        id = INTERPOLATOR_MARK
     SQL
     self.parse_all(record).first
 
@@ -83,7 +90,7 @@ class SQLObject
 
   def insert
     col_names = self.class.columns.drop(1).join(', ')
-    question_marks = ['?'] * attribute_values.length
+    question_marks = ['INTERPOLATOR_MARK'] * attribute_values.length
     question_marks = question_marks.join(', ')
     DBConnection.execute(<<-SQL, *attribute_values)
       INSERT INTO
@@ -102,7 +109,7 @@ class SQLObject
     cols = self.class.columns.drop(1)
 
     set_lines = cols.map do |col|
-      "#{col} = ?"
+      "#{col} = INTERPOLATOR_MARK"
     end
 
     set_lines = set_lines.join(', ')
@@ -113,7 +120,7 @@ class SQLObject
       SET
         #{set_lines}
       WHERE
-        id = ?
+        id = INTERPOLATOR_MARK
     SQL
 
   end
@@ -133,7 +140,7 @@ class SQLObject
       FROM
         #{self.class.table_name}
       WHERE
-        id = ?
+        id = INTERPOLATOR_MARK
     SQL
   end
 end

@@ -1,4 +1,10 @@
 default: &default
-  adapter: sqlite3
-  # encoding: unicode
+  # adapter: sqlite3
+  adapter: postgresql
+  encoding: unicode
   database: dragons
+  host: localhost
+  # pool: 5
+  user: 'pg_master'
+  password: 'hikariful6'
+  port: 5432
