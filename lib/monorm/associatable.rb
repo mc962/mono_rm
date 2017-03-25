@@ -1,9 +1,9 @@
-require 'active_support/inflector'
-
-require_relative 'sql_object'
-require_relative 'searchable'
-require 'byebug'
-class AssocOptions
+# require 'active_support/inflector'
+#
+# require_relative 'sql_object'
+# require_relative 'searchable'
+# require 'byebug'
+class MonoRM::AssocOptions
   attr_accessor(
     :foreign_key,
     :class_name,
@@ -19,7 +19,7 @@ class AssocOptions
   end
 end
 
-class BelongsToOptions < AssocOptions
+class MonoRM::BelongsToOptions < MonoRM::AssocOptions
   def initialize(name, options = {})
     @foreign_key = options[:foreign_key] || :"#{name.to_s}_id"
     @class_name = options[:class_name] || name.to_s.camelcase
@@ -28,7 +28,7 @@ class BelongsToOptions < AssocOptions
   end
 end
 
-class HasManyOptions < AssocOptions
+class MonoRM::HasManyOptions < MonoRM::AssocOptions
   def initialize(name, self_class_name, options = {})
     @foreign_key = options[:foreign_key] || "#{self_class_name.underscore.singularize}_id".to_sym
 
@@ -42,7 +42,7 @@ end
 module Associatable
   # Phase IIIb
   def belongs_to(name, options = {})
-    self.assoc_options[name] = BelongsToOptions.new(name, options)
+    self.assoc_options[name] = MonoRM::BelongsToOptions.new(name, options)
     define_method(name) do
       belongs_options = self.class.assoc_options[name]
       foreign_key = send(belongs_options.foreign_key)
@@ -54,7 +54,7 @@ module Associatable
 
   def has_many(name, options = {})
 
-    self.assoc_options[name] = HasManyOptions.new(name, self.name, options)
+    self.assoc_options[name] = MonoRM::HasManyOptions.new(name, self.name, options)
 
     define_method(name) do
       has_many_options = self.class.assoc_options[name]
@@ -91,7 +91,7 @@ module Associatable
 
 
       search_key = self.send(through_options_foreign_key)
-      has_one_results = DBConnection.execute(<<-SQL, search_key)
+      has_one_results = MonoRM::DBConnection.execute(<<-SQL, search_key)
         SELECT
           #{source_options_table}.*
         FROM
@@ -105,13 +105,13 @@ module Associatable
           #{through_options_table}.#{through_options_primary_key} = INTERPOLATOR_MARK
 
       SQL
-      
+
       source_options.model_class.parse_all(has_one_results).first
     end
   end
 
 end
 
-class SQLObject
+class MonoRM::SQLObject
   extend Associatable
 end

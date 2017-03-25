@@ -1,13 +1,10 @@
 require 'active_support/inflector'
 
-require_relative './searchable'
-require_relative './associatable'
 
-
-class SQLObject
+class MonoRM::SQLObject
 
   def self.columns
-    @cols ||= DBConnection.cols_exec(<<-SQL)
+    @cols ||= MonoRM::DBConnection.cols_exec(<<-SQL)
       SELECT
         *
       FROM
@@ -38,7 +35,7 @@ class SQLObject
   end
 
   def self.all
-    data = DBConnection.execute(<<-SQL)
+    data = MonoRM::DBConnection.execute(<<-SQL)
       SELECT
         *
       FROM
@@ -54,7 +51,7 @@ class SQLObject
   end
 
   def self.find(id)
-    record = DBConnection.execute(<<-SQL, id)
+    record = MonoRM::DBConnection.execute(<<-SQL, id)
       SELECT
         *
       FROM
@@ -87,14 +84,14 @@ class SQLObject
     col_names = self.class.columns.drop(1).join(', ')
     question_marks = ['INTERPOLATOR_MARK'] * attribute_values.length
     question_marks = question_marks.join(', ')
-    DBConnection.execute(<<-SQL, *attribute_values)
+    MonoRM::DBConnection.execute(<<-SQL, *attribute_values)
       INSERT INTO
         #{self.class.table_name}(#{col_names})
       VALUES
         (#{question_marks})
     SQL
 
-    send(:id=, DBConnection.last_insert_row_id)
+    send(:id=, MonoRM::DBConnection.last_insert_row_id)
   end
 
   def update
@@ -109,7 +106,7 @@ class SQLObject
 
     set_lines = set_lines.join(', ')
 
-    DBConnection.execute(<<-SQL, *attribs, id)
+    MonoRM::DBConnection.execute(<<-SQL, *attribs, id)
       UPDATE
         #{self.class.table_name}
       SET
@@ -130,7 +127,7 @@ class SQLObject
 
   def destroy
     id = self.id
-    DBConnection.execute(<<-SQL, id)
+    MonoRM::DBConnection.execute(<<-SQL, id)
       DELETE
       FROM
         #{self.class.table_name}

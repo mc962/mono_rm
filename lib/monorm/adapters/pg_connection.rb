@@ -1,13 +1,11 @@
 require 'pg'
-require 'yaml'
 
-
-class DBConnection
+class MonoRM::DBConnection
 
   def self.open
     # uri = URI.parse(ENV['DATABASE_URL'])
     @conn = PG::Connection.new(
-    dbname: DB_CONFIG['default']['database']
+    dbname: MONORM_DB_CONFIG['default']['database']
     # user: uri.user,
     # password: uri.password,
     # host: uri.host,
@@ -18,7 +16,7 @@ class DBConnection
   end
 
   def self.instance
-    DBConnection.open if @conn.nil?
+    MonoRM::DBConnection.open if @conn.nil?
 
     @conn
   end

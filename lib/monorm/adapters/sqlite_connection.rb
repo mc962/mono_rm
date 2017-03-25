@@ -1,13 +1,13 @@
 require 'sqlite3'
-require 'yaml'
+
 
 PRINT_QUERIES = ENV['PRINT_QUERIES'] == 'true'
 
-class DBConnection
+class MonoRM::DBConnection
 
 
   def self.open
-    DBConnection.load_db_path unless @db_path
+    MonoRM::DBConnection.load_db_path unless @db_path
 
     @db = SQLite3::Database.new(@db_path)
     @db.results_as_hash = true
@@ -17,7 +17,7 @@ class DBConnection
   end
 
   def self.instance
-    DBConnection.open if @db.nil?
+    MonoRM::DBConnection.open if @db.nil?
 
     @db
   end
@@ -55,7 +55,7 @@ class DBConnection
 
   def self.load_db_path
     dir = File.dirname(__FILE__)
-    db_name = "#{DB_CONFIG['default']['database']}.db"
+    db_name = "#{MONORM_DB_CONFIG['default']['database']}.db"
     @db_path = File.join(dir, '..', "/db/sqlite_db/#{db_name}")
   end
 

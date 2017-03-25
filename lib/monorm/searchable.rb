@@ -1,4 +1,4 @@
-require_relative 'sql_object'
+# require_relative 'sql_object'
 
 module Searchable
   def where(params)
@@ -8,7 +8,7 @@ module Searchable
     where_line = where_line.join(' AND ')
     param_values = params.values
 
-    data = DBConnection.execute(<<-SQL, *param_values)
+    data = MonoRM::DBConnection.execute(<<-SQL, *param_values)
       SELECT
         *
       FROM
@@ -20,6 +20,6 @@ module Searchable
   end
 end
 
-class SQLObject
+class MonoRM::SQLObject
   extend Searchable
 end
