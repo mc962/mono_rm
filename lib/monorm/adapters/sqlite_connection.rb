@@ -56,7 +56,7 @@ class MonoRM::DBConnection
   def self.load_db_path
     dir = File.dirname(__FILE__)
     db_name = "#{MONORM_DB_CONFIG['default']['database']}.db"
-    @db_path = File.join(dir, '..', "/db/sqlite_db/#{db_name}")
+    @db_path = File.join(dir, '..', "db", "sqlite_db", "#{db_name}")
   end
 
   private
