@@ -5,7 +5,7 @@ class MonoRM::DBConnection
   def self.open
     # uri = URI.parse(ENV['DATABASE_URL'])
     @conn = PG::Connection.new(
-    dbname: MONORM_DB_CONFIG['default']['database']
+    dbname: MonoRM::DB_CONFIG['default']['database']
     # user: uri.user,
     # password: uri.password,
     # host: uri.host,
@@ -27,8 +27,8 @@ class MonoRM::DBConnection
     args_counter = 1
 
     interpolated_sql_statement_elements = sql_statement.split(' ').map do |arg|
-      if arg == 'INTERPOLATOR_MARK'
-        interpolated_arg = "$#{args_counter}"
+      if /\bINTERPOLATOR_MARK\b/.match(arg)
+        interpolated_arg = arg.gsub(/\bINTERPOLATOR_MARK\b/, "$#{args_counter}")
         args_counter += 1
         interpolated_arg
       else
@@ -47,6 +47,10 @@ class MonoRM::DBConnection
     args = args.join("\n")
 
     instance.exec(args)[0].keys
+  end
+
+  def self.last_insert_row_id
+
   end
 
 end

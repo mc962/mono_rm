@@ -1,8 +1,3 @@
-# require 'active_support/inflector'
-#
-# require_relative 'sql_object'
-# require_relative 'searchable'
-# require 'byebug'
 class MonoRM::AssocOptions
   attr_accessor(
     :foreign_key,
@@ -24,7 +19,6 @@ class MonoRM::BelongsToOptions < MonoRM::AssocOptions
     @foreign_key = options[:foreign_key] || :"#{name.to_s}_id"
     @class_name = options[:class_name] || name.to_s.camelcase
     @primary_key = options[:primary_key] || :id
-    # debugger
   end
 end
 
@@ -40,7 +34,6 @@ class MonoRM::HasManyOptions < MonoRM::AssocOptions
 end
 
 module Associatable
-  # Phase IIIb
   def belongs_to(name, options = {})
     self.assoc_options[name] = MonoRM::BelongsToOptions.new(name, options)
     define_method(name) do
@@ -64,7 +57,6 @@ module Associatable
 
       model_class.constantize.where(has_many_options.foreign_key => primary_key)
     end
-    # has_many_options.model_class.where(has_many_options.primary_key => has_many_options.foreign_key)
   end
 
 
@@ -87,7 +79,6 @@ module Associatable
       source_options_table = source_options.table_name
       source_options_foreign_key = source_options.foreign_key
       source_options_primary_key = source_options.primary_key
-
 
 
       search_key = self.send(through_options_foreign_key)

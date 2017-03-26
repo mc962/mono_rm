@@ -3,6 +3,8 @@ require 'sqlite3'
 
 PRINT_QUERIES = ENV['PRINT_QUERIES'] == 'true'
 
+
+
 class MonoRM::DBConnection
 
 
@@ -25,16 +27,17 @@ class MonoRM::DBConnection
   def self.execute(*args)
     print_query(*args)
 
-    sql_statement = args[0]
-    interpolated_sql_statement_elements = sql_statement.split(' ').map do |arg|
-      if arg == 'INTERPOLATOR_MARK'
-        interpolated_arg = "?"
-      else
-        arg
-      end
-    end
-    interpolated_sql_statement = interpolated_sql_statement_elements.join(' ')
-    args[0] = interpolated_sql_statement
+    interpolated_sql_statement = args[0].gsub(/\bINTERPOLATOR_MARK\b/, '?')
+
+    # interpolated_sql_statement_elements = sql_statement.split(' ').map do |arg|
+    #   if arg == 'INTERPOLATOR_MARK'
+    #     interpolated_arg = "?"
+    #   else
+    #     arg
+    #   end
+    # end
+    # interpolated_sql_statement = interpolated_sql_statement_elements.join(' ')
+    # args[0] = interpolated_sql_statement
 
     interpolated_args = args.slice(1..-1)
 
@@ -55,8 +58,8 @@ class MonoRM::DBConnection
 
   def self.load_db_path
     dir = File.dirname(__FILE__)
-    db_name = "#{MONORM_DB_CONFIG['default']['database']}.db"
-    @db_path = File.join(dir, '..', "db", "sqlite_db", "#{db_name}")
+    db_name = "#{MonoRM::DB_CONFIG['default']['database']}.db"
+    @db_path = File.join(MonoRM::PROJECT_ROOT_DIR, "db", "sqlite_db", "#{db_name}")
   end
 
   private
