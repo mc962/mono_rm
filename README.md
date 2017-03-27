@@ -33,7 +33,7 @@ MonoRM was designed to work with several configuration files to allow for user c
 The following files are required:
 - config folder
   - database.yml - This file contains relevant configuration for the database
-  - boot.rb - This file (name not enforced) should call `MonoRM::DBInitializer.load_db_adapter`, which loads the appropriate database adapter file in the gem.
+  - boot.rb - This file (name not enforced) should define a constant named `PROJECT_ROOT_DIR` to represent the root directory of the _project_. It should also call `MonoRM::DBInitializer.load_db_adapter`, which loads the appropriate database adapter file in the gem.
   - model_loader.rb - This file (optional, but recommended), that loads all the models in the model directory that will be used in the application.
 - bin folder
   - There should be a file that requires `bundler/setup` and your choice of Ruby console to interact with the application, as well as the boot file from the config folder. Be sure to run the initialization methods from boot before startup, and then start the console
