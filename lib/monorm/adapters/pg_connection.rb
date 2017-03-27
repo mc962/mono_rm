@@ -39,8 +39,8 @@ class MonoRM::DBConnection
 
     args[0] = interpolated_sql_statement
     interpolated_args = args.slice(1..-1)
-
-    instance.exec(interpolated_sql_statement, interpolated_args)
+    interpolated_sql_statement << ' RETURNING id'
+    @returned_id = instance.exec(interpolated_sql_statement, interpolated_args)
   end
 
   def self.cols_exec(*args)
@@ -50,7 +50,7 @@ class MonoRM::DBConnection
   end
 
   def self.last_insert_row_id
-
+    @returned_id
   end
 
 end

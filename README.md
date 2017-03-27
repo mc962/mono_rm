@@ -1,8 +1,9 @@
 # MonoRM
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/monorm`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+MonoRM is a lightweight Object Relational Mapping (ORM) library that facilitates the creation and
+usage of Ruby objects from data retrieved from persistent storage, as well as the insertion and manipulation
+of that data into persistent storage. When a new model class extends the 'Base' class, the methods are provided
+allowing for interaction with the chosen database.
 
 ## Installation
 
@@ -22,13 +23,58 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+A small sample project that can be used to test MonoRM can be found here (coming soon).
+
+Relevant OS database drivers must be set up by user in order for gem and dependencies to install.
+
+MonoRM was designed to work with several configuration files to allow for user customization.
+
+
+The following files are required:
+- config folder
+  - database.yml - This file contains relevant configuration for the database
+  - boot.rb - This file (name not enforced) should call `MonoRM::DBInitializer.load_db_adapter`, which loads the appropriate database adapter file in the gem.
+  - model_loader.rb - This file (optional, but recommended), that loads all the models in the model directory that will be used in the application.
+- bin folder
+  - There should be a file that requires `bundler/setup` and your choice of Ruby console to interact with the application, as well as the boot file from the config folder. Be sure to run the initialization methods from boot before startup, and then start the console
+- db folder (for sqlite databases)
+  - sqlite_db folder
+    - `{database_name}.db` - A database file, with name chosen by the user, is required by sqlite to function. Maintain this folder structure and enter the name (without .db extension) in the `database.yml` file under the _database_ key
+
+The following files are recommended:
+- db folder
+  - `sqlite_setup.rb` - This is a setup script to setup a sqlite database. The recommended structure is to take a command line argument for the database name, and then run the setup. The setup will need a .db database file name path that will place the database file in the sqlite_db folder. A .sql file written for sqlite3 located in the sqlite_sql to seed the database with is also recommended. The following commands can then be run: `dropdb`, `createdb`, and `sqlite3 path_to_db_name < path_to_sql_file` to recreate the database to the specifications of the sqlite sql file.
+  - `pg_setup.rb` - This is a setup script to setup a postgres database. The recommended structure is similar to sqlite, but no db folder/file is needed, just a .sql file written for a postgreSQL database,
+  with the command `psql database_name < path_to_sql_file`.
+  - sqlite_sql folder
+    - db_name.sql - This is a .sql file named for the database to seed containing the relevant sql commands to seed the database, written for a sqlite3 database.
+  - pg_sql folder
+    - db_name.sql - This is a .sql file named for the database to seed containing the relevant sql commands to seed the database, written for a postgreSQL database.    
+
+- models folder
+  - This folder should contain any models that will be used to interact with the database, where each model should inherit from the `MonoRM::Base` class
+  
+## Database Support
+
+Currently there is support for PostgreSQL and SQLite3 databases. Support for additional databases
+may be added in the future.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests (not yet written). You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+## TODO
+
+- Documentation and code snippets for major features
+- Support for additional database query methods, including `joins`
+- Make `where` lazy and stackable
+- Implement Relation class
+- Implement validation methods
+- Implement `has_many, :through`
+- Prefetching using `includes`
+- Write additional database adapters, such as MySQL
 
 ## Contributing
 

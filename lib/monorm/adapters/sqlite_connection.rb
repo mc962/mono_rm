@@ -29,23 +29,12 @@ class MonoRM::DBConnection
 
     interpolated_sql_statement = args[0].gsub(/\bINTERPOLATOR_MARK\b/, '?')
 
-    # interpolated_sql_statement_elements = sql_statement.split(' ').map do |arg|
-    #   if arg == 'INTERPOLATOR_MARK'
-    #     interpolated_arg = "?"
-    #   else
-    #     arg
-    #   end
-    # end
-    # interpolated_sql_statement = interpolated_sql_statement_elements.join(' ')
-    # args[0] = interpolated_sql_statement
-
     interpolated_args = args.slice(1..-1)
 
 
     instance.execute(interpolated_sql_statement, interpolated_args)
   end
 
-# execute2 returns array of rows if no block specified
   def self.cols_exec(*args)
     print_query(*args)
 

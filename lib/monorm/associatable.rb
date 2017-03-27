@@ -17,7 +17,7 @@ end
 class MonoRM::BelongsToOptions < MonoRM::AssocOptions
   def initialize(name, options = {})
     @foreign_key = options[:foreign_key] || :"#{name.to_s}_id"
-    @class_name = options[:class_name] || name.to_s.camelcase
+    @class_name = options[:class_name] || name.to_s.camelcase.singularize
     @primary_key = options[:primary_key] || :id
   end
 end
@@ -41,7 +41,7 @@ module Associatable
       foreign_key = send(belongs_options.foreign_key)
       model_class = belongs_options.class_name
 
-      model_class.constantize.where(belongs_options.primary_key => foreign_key).first
+      model_class.where(belongs_options.primary_key => foreign_key).first
     end
   end
 
@@ -52,10 +52,9 @@ module Associatable
     define_method(name) do
       has_many_options = self.class.assoc_options[name]
       primary_key = send(has_many_options.primary_key)
-
       model_class = has_many_options.class_name
 
-      model_class.constantize.where(has_many_options.foreign_key => primary_key)
+      model_class.where(has_many_options.foreign_key => primary_key)
     end
   end
 
@@ -103,6 +102,6 @@ module Associatable
 
 end
 
-class MonoRM::SQLObject
+class MonoRM::Base
   extend Associatable
 end

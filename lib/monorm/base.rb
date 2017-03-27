@@ -3,7 +3,7 @@ require 'active_support/inflector'
 require 'monorm/associatable'
 require 'monorm/searchable'
 
-class MonoRM::SQLObject
+class MonoRM::Base
 
   def self.columns
     @cols ||= MonoRM::DBConnection.cols_exec(<<-SQL)

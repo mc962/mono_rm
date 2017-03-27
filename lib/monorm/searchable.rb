@@ -18,6 +18,6 @@ module Searchable
   end
 end
 
-class MonoRM::SQLObject
+class MonoRM::Base
   extend Searchable
 end
