@@ -39,7 +39,7 @@ module Associatable
     define_method(name) do
       belongs_options = self.class.assoc_options[name]
       foreign_key = send(belongs_options.foreign_key)
-      model_class = belongs_options.class_name
+      model_class = belongs_options.class_name.constantize
 
       model_class.where(belongs_options.primary_key => foreign_key).first
     end
@@ -52,7 +52,7 @@ module Associatable
     define_method(name) do
       has_many_options = self.class.assoc_options[name]
       primary_key = send(has_many_options.primary_key)
-      model_class = has_many_options.class_name
+      model_class = has_many_options.class_name.constantize
 
       model_class.where(has_many_options.foreign_key => primary_key)
     end

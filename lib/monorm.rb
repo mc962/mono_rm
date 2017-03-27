@@ -2,7 +2,7 @@ require 'yaml'
 
 require "monorm/version"
 
-require 'monorm/sql_object'
+require 'monorm/base'
 
 
 MonoRM::PROJECT_ROOT_DIR = PROJECT_ROOT_DIR
@@ -47,7 +47,7 @@ module MonoRM
         require adapter_path
       when 'sqlite3'
         adapter_path = File.join('monorm', 'adapters', 'sqlite_connection')
-        require adapter_path        
+        require adapter_path
       else
         raise 'Database type not found!'
       end

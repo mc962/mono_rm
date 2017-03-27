@@ -53,7 +53,7 @@ The following files are recommended:
 
 - models folder
   - This folder should contain any models that will be used to interact with the database, where each model should inherit from the `MonoRM::Base` class
-  
+
 ## Database Support
 
 Currently there is support for PostgreSQL and SQLite3 databases. Support for additional databases
@@ -68,12 +68,15 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## TODO
 
 - Documentation and code snippets for major features
+- Write RSpec tests
 - Support for additional database query methods, including `joins`
 - Make `where` lazy and stackable
 - Implement Relation class
 - Implement validation methods
 - Implement `has_many, :through`
 - Prefetching using `includes`
+- Make convenience utility methods such as `first` and `last`
+- Add support for `ENV['DATABASE_URL']`
 - Write additional database adapters, such as MySQL
 
 ## Contributing

@@ -26,7 +26,10 @@ class MonoRM::DBConnection
 
     args_counter = 1
 
+    should_return_id = false
+
     interpolated_sql_statement_elements = sql_statement.split(' ').map do |arg|
+      should_return_id = true if /\bINSERT\b/.match(arg)
       if /\bINTERPOLATOR_MARK\b/.match(arg)
         interpolated_arg = arg.gsub(/\bINTERPOLATOR_MARK\b/, "$#{args_counter}")
         args_counter += 1
@@ -39,7 +42,7 @@ class MonoRM::DBConnection
 
     args[0] = interpolated_sql_statement
     interpolated_args = args.slice(1..-1)
-    interpolated_sql_statement << ' RETURNING id'
+    interpolated_sql_statement << ' RETURNING id' if should_return_id
     @returned_id = instance.exec(interpolated_sql_statement, interpolated_args)
   end
 
