@@ -1,4 +1,5 @@
 require 'yaml'
+require 'erb'
 
 require "monorm/version"
 
@@ -34,8 +35,8 @@ module MonoRM
   def self.monorm
     File.join lib, 'monorm'
   end
-
-  DB_CONFIG = YAML.load(File.open("#{self.db_config}"))
+  DB_CONFIG = YAML.load ERB.new(IO.read("#{self.db_config}")).result
+  # DB_CONFIG = YAML.load(File.open("#{self.db_config}"))
 
   class MonoRM::DBInitializer
     def self.load_db_adapter
