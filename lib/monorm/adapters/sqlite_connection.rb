@@ -47,8 +47,8 @@ class MonoRM::DBConnection
 
   def self.load_db_path
     dir = File.dirname(__FILE__)
-    db_name = "#{MonoRM::DB_CONFIG['default']['database']}.db"
-    @db_path = File.join(MonoRM::PROJECT_ROOT_DIR, "db", "sqlite_db", "#{db_name}")
+    db_name = URI.parse(ENV['DATABASE_URL']).path[1..-1]
+    @db_path = File.join(MonoRM::PROJECT_ROOT_DIR, "db", "sqlite_db", "#{db_name}.db")
   end
 
   private

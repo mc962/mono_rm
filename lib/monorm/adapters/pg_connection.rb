@@ -3,13 +3,13 @@ require 'pg'
 class MonoRM::DBConnection
 
   def self.open
-    # uri = URI.parse(ENV['DATABASE_URL'])
+    uri = URI.parse(ENV['DATABASE_URL'])
     @conn = PG::Connection.new(
-    dbname: MonoRM::DB_CONFIG['default']['database']
-    # user: uri.user,
-    # password: uri.password,
-    # host: uri.host,
-    # port: uri.port,
+    user: uri.user,
+    password: uri.password,
+    host: uri.host,
+    port: uri.port,
+    dbname: uri.path[1..-1]
     )
 
     @conn

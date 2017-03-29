@@ -1,5 +1,6 @@
 require 'yaml'
 require 'erb'
+require 'uri'
 
 require "monorm/version"
 
@@ -23,11 +24,7 @@ module MonoRM
   def self.db_config
     File.join config, 'database.yml'
   end
-  #
-  # def self.bin
-  #   File.join root, 'bin'
-  # end
-  #
+
   def self.lib
     File.join root, 'lib'
   end
@@ -35,18 +32,17 @@ module MonoRM
   def self.monorm
     File.join lib, 'monorm'
   end
-  DB_CONFIG = YAML.load ERB.new(IO.read("#{self.db_config}")).result
-  # DB_CONFIG = YAML.load(File.open("#{self.db_config}"))
 
   class MonoRM::DBInitializer
     def self.load_db_adapter
 
-      adapter = DB_CONFIG['default']['adapter']
+      adapter = URI.parse(ENV['DATABASE_URL']).scheme
+
       case adapter
-      when 'postgresql'
+      when 'postgres'
         adapter_path = File.join('monorm', 'adapters', 'pg_connection')
         require adapter_path
-      when 'sqlite3'
+      when 'sqlite'
         adapter_path = File.join('monorm', 'adapters', 'sqlite_connection')
         require adapter_path
       else
