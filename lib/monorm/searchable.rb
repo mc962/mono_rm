@@ -16,6 +16,23 @@ module Searchable
     SQL
     parse_all(data)
   end
+
+  def first
+    data = MonoRM::DBConnection.execute(<<-SQL, limit_val=1)
+      SELECT
+        #{self.table_name}.*
+      FROM
+        #{self.table_name}
+      ORDER BY
+        #{self.table_name}.id ASC
+      LIMIT
+        limit_val
+    SQL
+    parse_all(data)
+  end
+
+  def last
+  end
 end
 
 class MonoRM::Base

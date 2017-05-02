@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "monorm"
+require 'support/factory_girl'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

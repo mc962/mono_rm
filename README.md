@@ -25,7 +25,7 @@ Or install it yourself as:
 
 A small sample project that can be used to test MonoRM can be found here (coming soon).
 
-Relevant OS database drivers must be set up by user in order for gem and dependencies to install.
+Relevant OS database drivers must be set up by user in order for gem and dependencies to install (Instructions for PostgreSQL installation coming soon).
 
 MonoRM was designed to work with several configuration files to allow for user customization.
 
@@ -54,6 +54,12 @@ The following files are recommended:
 - models folder
   - This folder should contain any models that will be used to interact with the database, where each model should inherit from the `MonoRM::Base` class
 
+## Features
+- CRUD Actions - Users may create new records in the database, read those records from the database, update certain value for a particular record in the database, and delete records from the database.
+- Searching - Users have several searching options available. A record may be found by it's id (`Dragon.find(id)`), or providing a hash to the where method (`Dragon.where(name: 'Bob')`)
+- Associations - Additional data related linked by a `foreign_key` to the original object may be obtained through an association method may be created in the particular model file. There are several associations available, belongs_to (`Dragon.rider`), has_many (`Dragon.memories`),
+and has_one_through, (`Memory.rider`). Additonal support is planned for a has_many option.
+
 ## Database Support
 
 Currently there is support for PostgreSQL and SQLite3 databases. Support for additional databases
@@ -76,7 +82,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 - Implement `has_many, :through`
 - Prefetching using `includes`
 - Make convenience utility methods such as `first` and `last`
-- Add support for `ENV['DATABASE_URL']`
+- Add support for `database.yml`
 - Write additional database adapters, such as MySQL
 
 ## Contributing

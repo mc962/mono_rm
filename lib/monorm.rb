@@ -51,4 +51,19 @@ module MonoRM
     end
   end
 
+  class MonoRM::MigrationInitializer
+    def self.load_migrator
+      migrator = URI.parse(ENV['DATABASE_URL']).scheme
+      case migrator
+      when 'postgres'
+        migrator_path = File.join('monorm', 'migrators', 'pg_migration')
+        require migrator_path
+      when 'sqlite'
+        migrator_path = File.join('monorm', 'migrators', 'sqlite_migration')
+        require migrator_path
+      else
+        raise 'Database type not found!'
+      end
+    end
+  end
 end

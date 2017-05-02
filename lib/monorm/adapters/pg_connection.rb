@@ -55,5 +55,46 @@ class MonoRM::DBConnection
   def self.last_insert_row_id
     @returned_id
   end
+#################DB and Migration Methods#####################################
 
+# db init methods
+  def self.create_database
+    uri = URI.parse(ENV['DATABASE_URL'])
+    # creates database name based on configuration listed in DATABASE_URL
+    db_name = uri.path[1..-1]
+    createdb_arg = "CREATE DATABASE #{db_name}"
+    # directly open a new db connection with these credentials, minus db_name
+    conn = PG::Connection.new(
+    user: uri.user,
+    password: uri.password,
+    host: uri.host,
+    port: uri.port
+    )
+    # create the new database
+    conn.exec(createdb_arg)
+    MonoRM::DBConnection.add_migrations_table
+    # create migration table
+  end
+
+  def self.add_migrations_table
+    MonoRM::Migration.new.create_table :migrations do |t|
+      t.primary_key
+      t.string       :version, null: false
+      t.string       :name, null: false
+    end
+  end
+######################
+  def self.drop_database(db_name)
+    uri = URI.parse(ENV['DATABASE_URL'])
+    # creates database name based on configuration listed in DATABASE_URL
+    db_name = uri.path[1..-1]
+    dropdb_arg = "DROP DATABASE IF EXISTS #{db_name}"
+
+    MonoRM::DBConnection.execute(dropdb_arg)
+  end
+
+  # def self.load_migrator
+  #   migrator_path  = File.join(PROJECT_ROOT_DIR, 'lib', 'monorm', 'migrators', 'pg_migration')
+  #   require migrator_path
+  # end
 end
