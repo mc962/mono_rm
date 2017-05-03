@@ -72,19 +72,12 @@ class MonoRM::DBConnection
     )
     # create the new database
     conn.exec(createdb_arg)
-    MonoRM::DBConnection.add_migrations_table
     # create migration table
+    MonoRM::Migration.create_migrations_table
   end
-
-  def self.add_migrations_table
-    MonoRM::Migration.new.create_table :migrations do |t|
-      t.primary_key
-      t.string       :version, null: false
-      t.string       :name, null: false
-    end
-  end
-######################
-  def self.drop_database(db_name)
+  
+  def self.drop_database
+    raise 'This doesnt work for now, just run dropdb in command line for now'
     uri = URI.parse(ENV['DATABASE_URL'])
     # creates database name based on configuration listed in DATABASE_URL
     db_name = uri.path[1..-1]
@@ -93,8 +86,4 @@ class MonoRM::DBConnection
     MonoRM::DBConnection.execute(dropdb_arg)
   end
 
-  # def self.load_migrator
-  #   migrator_path  = File.join(PROJECT_ROOT_DIR, 'lib', 'monorm', 'migrators', 'pg_migration')
-  #   require migrator_path
-  # end
 end
