@@ -71,7 +71,7 @@ module MonoRM
     def self.migrate(version = nil)
       migration_directory = File.join(PROJECT_ROOT_DIR, 'db', 'migrate')
       # load all migration files
-      migrations = MonoRM::Migrator.load_migrations(migration_directory)
+      migrations = MonoRM::Migrator.load_migrations(migration_directory).sort
       if version
         raise 'Not yet implemented, will be used to run specific migration by timestamped version number'
       else

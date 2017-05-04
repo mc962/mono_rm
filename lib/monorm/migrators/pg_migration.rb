@@ -109,9 +109,15 @@ class MonoRM::Migration
     self.execute_migration(sql_table_arguments)
   end
 
-  def add_column(table_name, column_name, column_type, constraints)
+  def add_column(table_name, column_name, column_type, constraints = {}, foreign_table_name = nil)
+    # if specified a foreign table, send that argument along (really only for fkey), otherwise proceed normally
+    if foreign_table_name
+      sql_column_args = send(column_type, column_name, constraints, foreign_table_name)
+    else
+      sql_column_args = send(column_type.to_sym, column_name, constraints)
+    end
 
-    sql_column = send(column_type.to_sym, column_name, constraints)
+    sql_column = sql_column_args.join(' ')
     sql_table_arguments = "ALTER TABLE #{table_name.to_s} ADD COLUMN #{sql_column}"
     self.execute_migration(sql_table_arguments)
   end
@@ -139,7 +145,7 @@ class MonoRM::Migration
     self.execute_migration(sql_table_arguments)
   end
 
-  def add_index(table_name, column_name, constraints)
+  def add_index(table_name, column_name, constraints ={})
     # we only want unique constraints for add_index
     raise 'Invalid index constraints' if constraints.count > 1 && constraints.keys.any?{|constraint| constraint != :unique }
     sql_table_arguments = "CREATE #{evaluate_constraints(constraints)} INDEX #{column_name.to_s}_index ON #{table_name.to_s.upcase}(#{column_name.to_s})"
@@ -147,52 +153,47 @@ class MonoRM::Migration
   end
 
   def remove_index(column_name)
-    #
-    # sql_arguments = "DROP INDEX #{column_name.to_s}_index"
-    # self.execute_migration(sql_table_arguments)
+    sql_table_arguments = "DROP INDEX #{column_name.to_s}_index"
+    self.execute_migration(sql_table_arguments)
   end
 
-  def string(column_name, constraints)
+  def string(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} character varying(255) #{evaluate_constraints(constraints)}"
   end
 
-  def text(column_name, constraints)
+  def text(column_name, constraints = {})
    sql_arguments << "#{column_name.to_s} TEXT #{evaluate_constraints(constraints)}"
   end
 
-  def integer(column_name, constraints)
+  def integer(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} INTEGER #{evaluate_constraints(constraints)}"
   end
 
-  def float(column_name, constraints)
+  def float(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} FLOAT #{evaluate_constraints(constraints)}"
   end
 
-  def decimal(column_name, constraints)
+  def decimal(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} DECIMAL #{evaluate_constraints(constraints)}"
   end
 
-  def boolean(column_name, constraints)
+  def boolean(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} BOOLEAN #{evaluate_constraints(constraints)}"
   end
 
-  def binary(column_name, constraints)
-    sql_arguments << "#{column_name.to_s}  BINARY #{evaluate_constraints(constraints)}"
+  def binary(column_name, constraints = {})
+    sql_arguments << "#{column_name.to_s}  BYTEA #{evaluate_constraints(constraints)}"
   end
 
-  def date(column_name, constraints)
+  def date(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} DATE #{evaluate_constraints(constraints)}"
   end
 
-  def time(column_name, constraints)
+  def time(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} TIME #{evaluate_constraints(constraints)}"
   end
 
-  def date_time(column_name, constraints)
-    sql_arguments << "#{column_name.to_s} DATE_TIME #{evaluate_constraints(constraints)}"
-  end
-
-  def timestamp(column_name, constraints)
+  def timestamp(column_name, constraints = {})
     sql_arguments << "#{column_name.to_s} TIMESTAMP #{evaluate_constraints(constraints)}"
   end
 
@@ -207,11 +208,12 @@ class MonoRM::Migration
         if val == true
           'UNIQUE'
         end
-      when :default
-        # blank spaces will be stripped from default values
-        stripped_val = val.strip
-        raise 'Use null: false instead of a blank string constraint' if stripped_val == ''
-        "DEFAULT #{stripped_val}"
+      # default values not currently supported
+      # when :default
+      #   # blank spaces will be stripped from default values
+      #   stripped_val = val.strip
+      #   raise 'Use null: false instead of a blank string constraint' if stripped_val == ''
+      #   "DEFAULT \'#{stripped_val}\'"
       else
         raise 'Invalid Constraint!'
       end
@@ -223,7 +225,8 @@ class MonoRM::Migration
     sql_arguments << "#{column_name} SERIAL PRIMARY KEY NOT NULL"
   end
 
-  def foreign_key(column_name, table_name, constraints)
+# recommended to run migrations involving foreign_keys separate from the table you are creating that they reference
+  def foreign_key(column_name, constraints = {}, table_name)
     sql_arguments << "#{column_name} INTEGER REFERENCES #{table_name} #{evaluate_constraints(constraints)}"
   end
 
