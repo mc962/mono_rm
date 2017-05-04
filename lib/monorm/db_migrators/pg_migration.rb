@@ -19,7 +19,7 @@ class MonoRM::Migration
   end
 
   def self.add_migration_to_migrations_table(migration_version, migration_name)
-    timestamped_version = MonoRM::Migration.convert_file_timestamp_to_time(migration_version) unless migration_version.class == Time
+    timestamped_version = migration_version.class == Time ? migration_version : MonoRM::Migration.convert_file_timestamp_to_time(migration_version)
 
     sql_statement = "INSERT INTO migrations (version, name) VALUES ($1, $2)"
 

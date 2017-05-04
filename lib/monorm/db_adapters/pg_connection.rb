@@ -55,9 +55,8 @@ class MonoRM::DBConnection
   def self.last_insert_row_id
     @returned_id
   end
-#################DB and Migration Methods#####################################
 
-# db init methods
+#################DB Level Methods#####################################
   def self.create_database
     uri = URI.parse(ENV['DATABASE_URL'])
     # creates database name based on configuration listed in DATABASE_URL
@@ -72,18 +71,15 @@ class MonoRM::DBConnection
     )
     # create the new database
     conn.exec(createdb_arg)
-    # create migration table
+    # create migrations table
     MonoRM::Migration.create_migrations_table
   end
-  
-  def self.drop_database
-    raise 'This doesnt work for now, just run dropdb in command line for now'
-    uri = URI.parse(ENV['DATABASE_URL'])
-    # creates database name based on configuration listed in DATABASE_URL
-    db_name = uri.path[1..-1]
-    dropdb_arg = "DROP DATABASE IF EXISTS #{db_name}"
 
-    MonoRM::DBConnection.execute(dropdb_arg)
+  def self.drop_database
+    uri = URI.parse(ENV['DATABASE_URL'])
+    db_name = uri.path[1..-1]
+
+    %x(dropdb #{db_name})
   end
 
 end

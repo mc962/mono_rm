@@ -5,7 +5,7 @@ require 'uri'
 require "monorm/version"
 
 require 'monorm/base'
-
+require 'monorm/migrator'
 
 MonoRM::PROJECT_ROOT_DIR = PROJECT_ROOT_DIR
 
@@ -64,7 +64,5 @@ module MonoRM
       end
     end
   end
-
-
 
 end

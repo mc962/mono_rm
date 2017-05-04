@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry', '~> 0.10.4'
   spec.add_development_dependency 'dotenv', '~> 2.2'
   spec.add_development_dependency 'factory_girl', '~> 4.8'
-  
+
 
   spec.add_runtime_dependency 'activesupport', '~> 5.0'
 
