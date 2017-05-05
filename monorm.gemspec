@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["michaelc962@yahoo.com"]
 
   spec.summary       = %q{MonoRM is a small ORM library designed to make interacting with the database easier.}
-  spec.description   = %q{MonoRM is a small ORM library designed to make interacting with the database easier. It allows for intereaction with multiple database types, model relations, and features such as basic CRUD actions}
+  spec.description   = %q{MonoRM is a small ORM library designed to make interacting with the database easier. It allows for intereaction with multiple database types, model relations, and features such as basic CRUD actions. It also supports a basic database migration system.}
   spec.homepage      = "https://github.com/mc962/monorm"
   spec.license       = "MIT"
 
@@ -38,6 +38,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry', '~> 0.10.4'
   spec.add_development_dependency 'dotenv', '~> 2.2'
   spec.add_development_dependency 'factory_girl', '~> 4.8'
+  spec.add_development_dependency 'pg', '~> 0.18'
+  spec.add_development_dependency 'sqlite3', '~> 1.3'
 
 
   spec.add_runtime_dependency 'activesupport', '~> 5.0'
