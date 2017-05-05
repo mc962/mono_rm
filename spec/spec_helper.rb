@@ -24,8 +24,12 @@ RSpec.configure do |config|
     require "monorm"
     MonoRM::DBInitializer.load_db_adapter
     MonoRM::MigrationInitializer.load_migrator
+
+    MonoRM::DBConnection.create_database
   end
 
-
+  config.after(:all) do
+    MonoRM::DBConnection.drop_database
+  end
 
 end

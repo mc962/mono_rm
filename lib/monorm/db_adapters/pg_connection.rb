@@ -79,7 +79,7 @@ class MonoRM::DBConnection
     uri = URI.parse(ENV['DATABASE_URL'])
     db_name = uri.path[1..-1]
 
-    %x(dropdb #{db_name})
+    %x(dropdb #{db_name} --if-exists)
   end
 
 end
