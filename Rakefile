@@ -1,6 +1,7 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 
+import "./lib/tasks/db.rake"
 # RSpec::Core::RakeTask.new(:spec)
 
 # might want to change this when using rake for future tasks
