@@ -64,11 +64,9 @@ class MonoRM::Base
         id = INTERPOLATOR_MARK
     SQL
     self.parse_all(record).first
-
   end
 
   def initialize(params = {})
-
     params.each do |attr_name, val|
       raise "unknown attribute '#{attr_name}'" unless self.class.columns.include?(attr_name.to_sym)
       send(:"#{attr_name}=", val)
@@ -127,6 +125,27 @@ class MonoRM::Base
     else
       insert
     end
+  end
+# quick, dirty fix to printing unneeded sql queries
+  def silent_save
+    if self.class.find(self.id)
+      update
+    else
+      insert
+    end
+  end
+
+  # quick fix for issues with printing find queries for simple seeding
+  def self.silent_find(id)
+    record = MonoRM::DBConnection.silent_execute(<<-SQL, id)
+      SELECT
+        *
+      FROM
+        #{self.table_name}
+      WHERE
+        id = INTERPOLATOR_MARK
+    SQL
+    self.parse_all(record).first
   end
 
   def destroy

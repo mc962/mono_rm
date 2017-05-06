@@ -8,7 +8,7 @@ class MonoRM::Migrator
     if version
       desired_version_timestamp = MonoRM::Migration.convert_file_timestamp_to_time(version)
 
-      current_migration_data = MonoRM::DBConnection.execute(<<-SQL)
+      current_migration_data = MonoRM::DBConnection.migrate_exec(<<-SQL)
         SELECT
           MAX(version)
         FROM
@@ -89,7 +89,7 @@ class MonoRM::Migrator
     migrations = load_migrations(migration_directory)
     # get table count to raise error is rollback count exceeds number of migrations in database
     # uses count to find this, if you have a billion migrations and it becomes slow then you are probably doing migrations wrong, consider cleaning the folder out
-    record_count = MonoRM::DBConnection.execute("SELECT COUNT(*) FROM migrations").getvalue(0,0).to_i
+    record_count = MonoRM::DBConnection.migrate_exec("SELECT COUNT(*) FROM migrations").getvalue(0,0).to_i
 
     raise "Too many rollbacks specified, max allowed in this transaction is #{record_count}" if rollback_count.to_i > record_count
 
@@ -97,12 +97,12 @@ class MonoRM::Migrator
     rollback_count.to_i.times do
       table_name = MonoRM::Migration.remove_migration_from_migrations_table
       migration_class = table_name.camelcase.constantize.new
-      puts "== #{latest_migration_name.camelcase}: reverting ======================="
+      puts "== #{migration_class.class.to_s}: reverting ======================="
       migrate_begin = Time.now
       migration_class.down
       migrate_end = Time.now
       migration_duration = migrate_end - migrate_begin
-      puts "== #{latest_migration_name.camelcase}: reverted (#{migration_duration}s) ======================="
+      puts "== #{migration_class.class.to_s}: reverted (#{migration_duration}s) ======================="
       puts
     end
   end
@@ -125,7 +125,7 @@ class MonoRM::Migrator
   end
 
   def self.find_last_migration
-    MonoRM::DBConnection.execute(<<-SQL)
+    MonoRM::DBConnection.migrate_exec(<<-SQL)
       SELECT
         version, name
       FROM

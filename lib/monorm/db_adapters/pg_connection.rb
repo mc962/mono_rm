@@ -43,8 +43,35 @@ class MonoRM::DBConnection
     args[0] = interpolated_sql_statement
     interpolated_args = args.slice(1..-1)
     interpolated_sql_statement << ' RETURNING id' if should_return_id
-    puts interpolated_sql_statement
+    puts "#{interpolated_sql_statement}, #{interpolated_args}"
     @returned_id = instance.exec(interpolated_sql_statement, interpolated_args)
+  end
+
+  def silent_execute(*args)
+
+    sql_statement = args[0]
+
+    args_counter = 1
+
+    should_return_id = false
+
+    interpolated_sql_statement_elements = sql_statement.split(' ').map do |arg|
+      should_return_id = true if /\bINSERT\b/.match(arg)
+      if /\bINTERPOLATOR_MARK\b/.match(arg)
+        interpolated_arg = arg.gsub(/\bINTERPOLATOR_MARK\b/, "$#{args_counter}")
+        args_counter += 1
+        interpolated_arg
+      else
+        arg
+      end
+    end
+    interpolated_sql_statement = interpolated_sql_statement_elements.join(' ')
+
+    args[0] = interpolated_sql_statement
+    interpolated_args = args.slice(1..-1)
+    interpolated_sql_statement << ' RETURNING id' if should_return_id    
+    @returned_id = instance.exec(interpolated_sql_statement, interpolated_args)
+
   end
 
   def self.migrate_exec(*args)
