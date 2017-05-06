@@ -22,14 +22,21 @@ class MonoRM::Migrator
       end
 
       if desired_version_timestamp > current_migration_timestamp
+        puts
         migrations.each do |migration|
           raw_timestamp, name = MonoRM::Migrator.parse_migration_file(migration)
           processed_timestamp = MonoRM::Migration.convert_file_timestamp_to_time(raw_timestamp)
           migration_class = name.camelcase.constantize.new
           break if processed_timestamp > desired_version_timestamp
           next if MonoRM::Migration.migration_ran?(raw_timestamp)
+          puts "== #{raw_timestamp} #{name.camelcase}: migrating ======================="
+          migrate_begin = Time.now
           migration_class.up
           MonoRM::Migration.add_migration_to_migrations_table(raw_timestamp, name)
+          migrate_end = Time.now
+          migration_duration = migrate_end - migrate_begin
+          puts "== #{raw_timestamp} #{name.camelcase}: migrated (#{migration_duration}s) ======================="
+          puts
         end
       elsif desired_version_timestamp < current_migration_timestamp
 
@@ -38,13 +45,17 @@ class MonoRM::Migrator
         latest_timestamp = Time.parse(latest_timestamp_data).getutc + Time.parse(latest_timestamp_data).utc_offset
         latest_migration_name = latest_migration_data.getvalue(0, 1)
 
+        puts
         until latest_timestamp <= desired_version_timestamp
-
-
           migration_class = latest_migration_name.camelcase.constantize.new
+          puts "== #{latest_migration_name.camelcase}: reverting ======================="
+          migrate_begin = Time.now
           migration_class.down
           MonoRM::Migration.remove_migration_from_migrations_table
-
+          migrate_end = Time.now
+          migration_duration = migrate_end - migrate_begin
+          puts "== #{latest_migration_name.camelcase}: reverted (#{migration_duration}s) ======================="
+          puts
           latest_migration_data = MonoRM::Migrator.find_last_migration
           latest_raw_timestamp = latest_migration_data.getvalue(0, 0)
           latest_migration_name = latest_migration_data.getvalue(0, 1)
@@ -56,12 +67,19 @@ class MonoRM::Migrator
 
     else
       # iterate through each migration, and call the up/ migrate forward method
+      puts
       migrations.each do |migration|
         raw_timestamp, name = MonoRM::Migrator.parse_migration_file(migration)
         next if MonoRM::Migration.migration_ran?(raw_timestamp)
         migration_class = name.camelcase.constantize.new
+        puts "== #{raw_timestamp} #{name.camelcase}: migrating ======================="
+        migrate_begin = Time.now
         migration_class.up
         MonoRM::Migration.add_migration_to_migrations_table(raw_timestamp, name)
+        migrate_end = Time.now
+        migration_duration = migrate_end - migrate_begin
+        puts "== #{raw_timestamp} #{name.camelcase}: migrated (#{migration_duration}s) ======================="
+        puts
       end
     end
   end
@@ -75,10 +93,17 @@ class MonoRM::Migrator
 
     raise "Too many rollbacks specified, max allowed in this transaction is #{record_count}" if rollback_count.to_i > record_count
 
+    puts
     rollback_count.to_i.times do
       table_name = MonoRM::Migration.remove_migration_from_migrations_table
       migration_class = table_name.camelcase.constantize.new
+      puts "== #{latest_migration_name.camelcase}: reverting ======================="
+      migrate_begin = Time.now
       migration_class.down
+      migrate_end = Time.now
+      migration_duration = migrate_end - migrate_begin
+      puts "== #{latest_migration_name.camelcase}: reverted (#{migration_duration}s) ======================="
+      puts
     end
   end
 

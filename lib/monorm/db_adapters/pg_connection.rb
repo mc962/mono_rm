@@ -21,7 +21,7 @@ class MonoRM::DBConnection
     @conn
   end
 
-  def self.execute(*args)
+  def self.execute(*args )
     sql_statement = args[0]
 
     args_counter = 1
@@ -43,13 +43,18 @@ class MonoRM::DBConnection
     args[0] = interpolated_sql_statement
     interpolated_args = args.slice(1..-1)
     interpolated_sql_statement << ' RETURNING id' if should_return_id
+    puts interpolated_sql_statement
     @returned_id = instance.exec(interpolated_sql_statement, interpolated_args)
+  end
+
+  def self.migrate_exec(*args)
+    instance.exec(args[0], args[1..-1])
   end
 
   def self.cols_exec(*args)
     args = args.join("\n")
 
-    instance.exec(args)[0].keys
+    instance.exec(args).fields
   end
 
   def self.last_insert_row_id
@@ -73,6 +78,7 @@ class MonoRM::DBConnection
     conn.exec(createdb_arg)
     # create migrations table
     MonoRM::Migration.create_migrations_table
+    puts "Created database #{db_name}"
   end
 
   def self.drop_database
@@ -80,6 +86,7 @@ class MonoRM::DBConnection
     db_name = uri.path[1..-1]
 
     %x(dropdb #{db_name} --if-exists)
+    puts "Dropped database #{db_name}"
   end
 
 end

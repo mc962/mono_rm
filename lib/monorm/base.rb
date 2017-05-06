@@ -3,6 +3,8 @@ require 'active_support/inflector'
 require 'monorm/associatable'
 require 'monorm/searchable'
 
+
+
 class MonoRM::Base
 
   def self.columns
